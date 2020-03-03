@@ -4,6 +4,70 @@ export type MiscEvent = React.FormEvent<
 
 export type UserCourseRoleType = "administrator" | "assistant" | "teacher"
 
+type QuizAnswerStatus =
+  | "draft"
+  | "submitted"
+  | "enough-received-but-not-given"
+  | "spam"
+  | "confirmed"
+  | "rejected"
+  | "deprecated"
+
+export interface IQuizAnswer {
+  id: string
+  quizId: string
+  userId: number
+  languageId: string
+  status: QuizAnswerStatus
+  peerReviews: IPeerReview[]
+  userQuizState?: any
+  itemAnswers: IQuizItemAnswer[]
+}
+
+export interface IQuizItemAnswer {
+  id: string
+  quizAnswerId: string
+  quizItemId: string
+  textData?: string
+  intData?: number
+  correct?: boolean
+  optionAnswers: IQuizItemOptionAnswer[]
+}
+
+export interface IQuizItemOptionAnswer {
+  id: string
+  quizItemAnswerId: string
+  quizOptionId: string
+}
+
+type UserQuizStateStatus = "open" | "locked"
+
+export interface IUserQuizState {
+  userId: number
+  quizId: string
+  peerReviewsGiven: null | number
+  peerReviewsReceived: null | number
+  pointsAwarded: null | number
+  spamFlags: null | number
+  status: UserQuizStateStatus
+}
+
+export interface IPeerReview {
+  id: string
+  quizAnswerId: string
+  userId: number
+  peerReviewCollectionId?: string
+  rejectedQuizAnswerIds: string[]
+  answers: IPeerReviewQuestionAnswer[]
+}
+
+export interface IPeerReviewQuestionAnswer {
+  peerReviewId: string
+  peerReviewQuestionId: string
+  value: null | number
+  text: null | string
+}
+
 export type QuizItemType =
   | "essay"
   | "multiple-choice"
@@ -125,7 +189,7 @@ export interface IPeerReviewCollectionText {
   body: string
 }
 
-type PeerReviewQuestionType = "grade" | "essay"
+export type PeerReviewQuestionType = "grade" | "essay"
 
 export interface IPeerReviewCollectionQuestionText {
   peerReviewQuestionId: string

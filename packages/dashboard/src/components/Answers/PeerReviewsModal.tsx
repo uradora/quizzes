@@ -14,33 +14,68 @@ import {
 } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-import { setQuiz } from "../../store/filter/actions"
+import {
+  IPeerReview,
+  IPeerReviewCollection,
+  IPeerReviewQuestionAnswer,
+  IQuiz,
+  IQuizAnswer,
+  PeerReviewQuestionType,
+} from "../../interfaces"
 
-class PeerReviewsModal extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
+interface IPeerReviewsModalProps {
+  quizzes: IQuiz[]
+  answers: IQuizAnswer[]
+  peerReviews: IPeerReview[]
+  open: boolean
+  onClose: any
+  answer: any
+}
+
+const PeerReviewsModal: React.FunctionComponent<
+  IPeerReviewsModalProps
+> = props => {
+  const relatedQuiz = props.quizzes.find(q => q.id === props.answer.quizId)
+
+  if (
+    !props.peerReviews ||
+    !relatedQuiz ||
+    !relatedQuiz.peerReviewCollections
+  ) {
+    return <div />
   }
 
-  public render() {
-    if (!this.props.peerReviews) {
-      return <div />
-    }
-    return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.props.onClose}
-        aria-labelledby="peer-reviews-modal-title"
-        fullWidth={true}
-        maxWidth="md"
-      >
-        <DialogTitle>
-          Received peer reviews ({this.props.peerReviews.length})
-        </DialogTitle>
+  const peerReviewTitle = extractCommonEnding(
+    relatedQuiz.peerReviewCollections!.map(prc => prc.texts[0].title),
+  )
 
-        <DialogContent>
-          <Grid container={true} spacing={16}>
-            {this.props.peerReviews !== null &&
-              this.props.peerReviews.map((pr, idx) => (
+  return (
+    <Dialog
+      open={props.open}
+      onClose={props.onClose}
+      aria-labelledby="peer-reviews-modal-title"
+      fullWidth={true}
+      maxWidth="md"
+    >
+      <DialogTitle>
+        Received peer reviews ({props.peerReviews.length})
+      </DialogTitle>
+
+      <DialogContent>
+        <Grid container={true} spacing={16}>
+          {props.peerReviews !== null &&
+            props.peerReviews.map((pr, idx) => {
+              const peerReviewCollection = relatedQuiz.peerReviewCollections!.find(
+                prc => prc.id === pr.peerReviewCollectionId,
+              )
+
+              console.log("The prc id: ", pr.peerReviewCollectionId)
+
+              if (!peerReviewCollection) {
+                return "What in tarnation?"
+              }
+
+              return (
                 <Grid
                   item={true}
                   xs={12}
@@ -50,31 +85,31 @@ class PeerReviewsModal extends React.Component<any, any> {
                   <PeerReview
                     peerReviewAnswer={pr}
                     idx={idx}
-                    peerReviewQuestions={
-                      this.props.quizzes.find(
-                        q => q.id === this.props.answer.quizId,
-                      ).peerReviewCollections[0]
-                    }
-                    peerReviewTitle={extractCommonEnding(
-                      this.props.quizzes
-                        .find(q => q.id === this.props.answer.quizId)
-                        .peerReviewCollections.map(prc => prc.texts[0].title),
-                    )}
+                    peerReviewQuestions={peerReviewCollection}
+                    peerReviewTitle={peerReviewTitle}
                   />
+                  )} />
                 </Grid>
-              ))}
-          </Grid>
-        </DialogContent>
+              )
+            })}
+        </Grid>
+      </DialogContent>
 
-        <DialogActions>
-          <Button onClick={this.props.onClose}>close</Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
+      <DialogActions>
+        <Button onClick={props.onClose}>close</Button>
+      </DialogActions>
+    </Dialog>
+  )
 }
 
-const PeerReview = ({
+interface IPeerReviewProps {
+  idx: number
+  peerReviewAnswer: IPeerReview
+  peerReviewQuestions: IPeerReviewCollection
+  peerReviewTitle: string
+}
+
+const PeerReview: React.FunctionComponent<IPeerReviewProps> = ({
   idx,
   peerReviewAnswer,
   peerReviewQuestions,
@@ -99,6 +134,10 @@ const PeerReview = ({
             const answer = peerReviewAnswer.answers.find(
               pra => pra.peerReviewQuestionId === question.id,
             )
+
+            if (!answer) {
+              return <div>Something very odd</div>
+            }
 
             return (
               <Grid item={true} xs={12} key={question.id}>
@@ -148,13 +187,21 @@ const extractCommonEnding = (strings: string[]): string => {
   return ""
 }
 
-const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
+interface IPeerReviewQuestionAnswerProps {
+  type: PeerReviewQuestionType
+  questionAnswer: IPeerReviewQuestionAnswer
+  title: string
+}
+
+const PeerReviewQuestionAnswer: React.FunctionComponent<
+  IPeerReviewQuestionAnswerProps
+> = ({ type, questionAnswer, title }) => {
   if (type === "essay") {
     return (
       <React.Fragment>
         <Typography variant="subheading">{title}</Typography>
         <Typography variant="body1" style={{ wordBreak: "break-word" }}>
-          {questionAnswer.text}
+          {questionAnswer ? questionAnswer.text : "mystique"}
         </Typography>
       </React.Fragment>
     )
@@ -191,7 +238,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { setQuiz },
-)(PeerReviewsModal)
+export default connect(mapStateToProps)(PeerReviewsModal)
