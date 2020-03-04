@@ -208,7 +208,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             rowsMax={15}
             fullWidth={true}
             variant="outlined"
-            value={this.props.quizTexts.body}
+            value={this.props.quizTexts.body || ""}
             onChange={this.changeTempAttribute("body")}
           />
         </Grid>
@@ -217,7 +217,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
             <TextField
               label="Submit message"
-              value={this.props.quizTexts.submitMessage}
+              value={this.props.quizTexts.submitMessage || ""}
               onChange={this.changeTempAttribute("submitMessage")}
               multiline={true}
               fullWidth={true}

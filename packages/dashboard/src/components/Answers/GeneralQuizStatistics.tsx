@@ -27,20 +27,10 @@ class GeneralStatistics extends React.Component<any, any> {
             </Grid>
 
             <Grid item={true} xs={12}>
-              <Typography variant="body1">Of those:</Typography>
+              <Typography variant="body1">Criteria:</Typography>
               <ul>
-                <li>
-                  <Grid item={true} xs={12}>
-                    <Typography variant="body1">
-                      Waiting for peer review(s): {"-"}
-                    </Typography>
-                  </Grid>
-                </li>
-                <li>
-                  <Typography variant="body1">
-                    Flagged as spam: {"-"}
-                  </Typography>
-                </li>
+                <li>Status: submitted or spam</li>
+                <li>Older than two weeks</li>
               </ul>
             </Grid>
           </Grid>

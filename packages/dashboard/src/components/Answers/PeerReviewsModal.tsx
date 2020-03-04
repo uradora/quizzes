@@ -66,13 +66,33 @@ const PeerReviewsModal: React.FunctionComponent<
           {props.peerReviews !== null &&
             props.peerReviews.map((pr, idx) => {
               const peerReviewCollection = relatedQuiz.peerReviewCollections!.find(
-                prc => prc.id === pr.peerReviewCollectionId,
+                prc => {
+                  if (pr.peerReviewCollectionId) {
+                    return prc.id === pr.peerReviewCollectionId
+                  }
+
+                  // At least in testing environment some (older) answers have no peer review collection id
+                  // sometimes it can be figured out from answers
+                  const questionId =
+                    pr.answers && pr.answers[0].peerReviewQuestionId
+                  if (!questionId) {
+                    return false
+                  }
+
+                  return prc.questions.some(
+                    question => question.id === questionId,
+                  )
+                },
               )
 
-              console.log("The prc id: ", pr.peerReviewCollectionId)
-
               if (!peerReviewCollection) {
-                return "What in tarnation?"
+                return (
+                  <Typography>
+                    The answer could not be connected to a question. Perhaps the
+                    peer reviews have been modified since this review was given.
+                    Contact technical support if the review should be displayed.
+                  </Typography>
+                )
               }
 
               return (
@@ -88,7 +108,6 @@ const PeerReviewsModal: React.FunctionComponent<
                     peerReviewQuestions={peerReviewCollection}
                     peerReviewTitle={peerReviewTitle}
                   />
-                  )} />
                 </Grid>
               )
             })}
@@ -200,8 +219,16 @@ const PeerReviewQuestionAnswer: React.FunctionComponent<
     return (
       <React.Fragment>
         <Typography variant="subheading">{title}</Typography>
-        <Typography variant="body1" style={{ wordBreak: "break-word" }}>
-          {questionAnswer ? questionAnswer.text : "mystique"}
+        <Typography
+          variant="body1"
+          style={{
+            wordBreak: "break-word",
+            color: questionAnswer ? "inherit" : "red",
+          }}
+        >
+          {questionAnswer
+            ? questionAnswer.text
+            : "Failed to display the peer review answer"}
         </Typography>
       </React.Fragment>
     )

@@ -357,32 +357,44 @@ class PeerReviewsSummary extends React.Component<any, any> {
               alignItems="center"
             >
               <Grid item={true} xs={12}>
-                <Typography variant="subtitle1" color="textSecondary">
-                  SPAM FLAGS:{" "}
-                  {this.props.answer.userQuizState
+                <Typography>
+                  Spam flags received:{" "}
+                  {this.props.answer.userQuizState &&
+                  typeof this.props.answer.userQuizState.spamCount === "number"
                     ? this.props.answer.userQuizState.spamCount
-                    : "not calculated"}
-                  {this.props.course.maxSpamFlags &&
-                    `. (Maximum allowed: ${this.props.course.maxSpamFlags})`}
+                    : "Not calculated (likely old data)"}
                 </Typography>
+
+                <CourseSettingNotifier
+                  value={this.props.course.maxSpamFlagsReceived}
+                  label="Maximum allowed spam flags"
+                />
               </Grid>
               <Grid item={true} xs={12}>
                 <Typography variant="body1">
                   Peer reviews given:{" "}
-                  {this.props.answer.userQuizState
+                  {this.props.answer.userQuizState &&
+                  typeof this.props.answer.userQuizState.peerReviewsGiven ===
+                    "number"
                     ? this.props.answer.userQuizState.peerReviewsGiven
-                    : "not calculated"}
-                  {this.props.course.minPeerReviewsGiven &&
-                    `. (Required: ${this.props.course.minPeerReviewsGiven})`}
+                    : "not calculated (likely old data)"}
                 </Typography>
+
+                <CourseSettingNotifier
+                  value={this.props.course.minPeerReviewsGiven}
+                  label="Minimum given peer reviews"
+                />
               </Grid>
 
               <Grid item={true} xs={12}>
                 <Typography variant="body1">
                   Peer reviews received: {this.props.peerReviewsAnswers.length}
-                  {this.props.course.minPeerReviewsReceived &&
-                    `. (Required: ${this.props.course.minPeerReviewsReceived})`}
                 </Typography>
+
+                <CourseSettingNotifier
+                  value={this.props.course.minPeerReviewsReceived}
+                  label="Minimum received peer reviews"
+                />
               </Grid>
 
               {this.props.course.minReviewAverage && (
@@ -523,6 +535,24 @@ const mapStateToProps = state => {
     filter: state.filter,
     user: state.user,
   }
+}
+
+interface ICourseSettingNotifierProps {
+  value: any
+  label: string
+}
+
+const CourseSettingNotifier: React.FunctionComponent<
+  ICourseSettingNotifierProps
+> = ({ value, label }) => {
+  let message
+  if (value) {
+    message = label + ": " + value
+  } else {
+    message =
+      "No course limit on " + label.charAt(0).toLowerCase() + label.slice(1)
+  }
+  return <Typography>{message}</Typography>
 }
 
 export default connect(

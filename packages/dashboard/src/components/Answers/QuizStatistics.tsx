@@ -15,7 +15,6 @@ import {
   setAttentionRequiringAnswers,
 } from "../../store/answers/actions"
 import { setQuiz } from "../../store/filter/actions"
-import LanguageBar from "../GeneralTools/LanguageBar"
 import Answers from "./Answers"
 import DataExporter from "./DataExporter"
 import FilterOptions from "./FilterOptions"
@@ -203,8 +202,6 @@ class QuizStatistics extends React.Component<any, any> {
                 </Grid>
               </Grid>
             </Grid>
-
-            <LanguageBar />
 
             {this.props.answers &&
             (this.props.answers.length === 0 ||

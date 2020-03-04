@@ -79,23 +79,9 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
           )}
           <QuizInfo quizTexts={this.props.edit.texts[0]} />
 
+          {/* confirm exit if unsaved changes */}
           <Prompt message={this.checker} />
 
-          {this.props.edit.course.languages.map(
-            (l, i) =>
-              this.props.filter.language === l.id && (
-                <TabContainer
-                  text={this.props.edit.texts.find(
-                    text => text.languageId === l.id,
-                  )}
-                  textIndex={this.props.edit.texts.findIndex(
-                    text => text.languageId === l.id,
-                  )}
-                  handleChange={this.handleChange}
-                  key={l.name}
-                />
-              ),
-          )}
           <Toolbar>
             <Typography style={{ flex: 1 }} />
             <Button
