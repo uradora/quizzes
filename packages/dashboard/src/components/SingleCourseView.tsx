@@ -8,7 +8,7 @@ import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
 import { IUserState } from "../store/user/reducer"
 import CourseDuplicateButton from "./CourseDuplicateButton"
-import LanguageBar from "./GeneralTools/LanguageBar"
+import CourseSettingsEditor from "./CourseSettingsEditor"
 import QuizCorrespondenceFileDownloader from "./QuizCorrespondenceFileDownloader"
 
 interface ISingleCoursePropsFromParent {
@@ -169,9 +169,11 @@ class SingleCourseView extends React.Component<
               </Grid>
             </Grid>
 
-            <LanguageBar />
+            <Grid>
+              <CourseSettingsEditor />
+            </Grid>
 
-            <Grid item={true} xs="auto">
+            <Grid item={true} xs={12}>
               <Typography variant="subtitle1">
                 QUIZZES ON THIS COURSE
               </Typography>

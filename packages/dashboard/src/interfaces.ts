@@ -171,12 +171,12 @@ export interface ICourseText {
 
 export interface ICourse {
   id: string
-  minScoreToPass: number
-  minProgressToPass: number
-  minPeerReviewsReceived: number
-  minPeerReviewsGiven: number
-  minReviewAverage: number
-  maxSpamFlags: number
+  minScoreToPass: null | number
+  minProgressToPass: null | number
+  minPeerReviewsReceived: null | number
+  minPeerReviewsGiven: null | number
+  minReviewAverage: null | number
+  maxSpamFlags: null | number
   languages: ILanguage[]
   texts: ICourseText[]
   organization: any

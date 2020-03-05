@@ -24,14 +24,29 @@ const FilterBox = ({ numberOfAnswers }) => {
         </Grid>
 
         <Grid item={true} xs={12}>
-          <Typography variant="subtitle1">Filter options: to do</Typography>
+          <Typography variant="subtitle1">Filter options:</Typography>
+          <QuizAnswersFilterSelection />
         </Grid>
 
         <Grid item={true} xs={12}>
-          <Typography variant="subtitle1">Order options: to do</Typography>
+          <Typography variant="subtitle1">Order options:</Typography>
         </Grid>
       </Grid>
     </React.Fragment>
+  )
+}
+
+const QuizAnswersFilterSelection: React.FunctionComponent<any> = () => {
+  return (
+    <ul>
+      <li>Age (both ends settable)</li>
+      <li>Status (multiple selection)</li>
+      <li>Spam flags (more than, fewer than than)</li>
+      <li>Given peer reviews (more than, fewer than)</li>
+      <li>Received peer reviews(more than, fewer than)</li>
+      <li>Average of all grades (more, less)</li>
+      <li>Other calculated statistical numbers</li>
+    </ul>
   )
 }
 

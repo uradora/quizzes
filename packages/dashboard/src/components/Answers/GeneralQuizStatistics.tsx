@@ -27,10 +27,14 @@ class GeneralStatistics extends React.Component<any, any> {
             </Grid>
 
             <Grid item={true} xs={12}>
-              <Typography variant="body1">Criteria:</Typography>
+              <Typography variant="body1">Statistical numbers:</Typography>
               <ul>
-                <li>Status: submitted or spam</li>
-                <li>Older than two weeks</li>
+                <li>How many marked as spam?</li>
+                <li>
+                  How many worse received / given enough, but received poor
+                  grades?
+                </li>
+                <li>How many have given enough, but not yet received?</li>
               </ul>
             </Grid>
           </Grid>
