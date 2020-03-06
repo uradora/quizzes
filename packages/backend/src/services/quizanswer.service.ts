@@ -374,10 +374,15 @@ export default class QuizAnswerService {
       firstAllowedTime,
       lastAllowedTime,
       languageIds,
-      peerReviewsGiven,
-      peerReviewsReceived,
+      minPeerReviewsGiven,
+      maxPeerReviewsGiven,
+      minPeerReviewsReceived,
+      maxPeerReviewsReceived,
       quizRequiresPeerReviews,
-      spamFlags,
+      minSpamFlags,
+      maxSpamFlags,
+      minPeerReviewAverage,
+      maxPeerReviewAverage,
       addPeerReviews,
       addSpamFlagNumber,
     } = query
@@ -393,9 +398,14 @@ export default class QuizAnswerService {
       !firstAllowedTime &&
       !lastAllowedTime &&
       (!languageIds || languageIds.length === 0) &&
-      typeof peerReviewsGiven !== "number" &&
-      typeof peerReviewsReceived !== "number" &&
-      typeof spamFlags !== "number"
+      typeof minPeerReviewsGiven !== "number" &&
+      typeof maxPeerReviewsGiven !== "number" &&
+      typeof minPeerReviewsReceived !== "number" &&
+      typeof maxPeerReviewsReceived !== "number" &&
+      typeof minSpamFlags !== "number" &&
+      typeof maxSpamFlags !== "number" &&
+      typeof minPeerReviewAverage !== "number" &&
+      typeof maxPeerReviewAverage !== "number"
     ) {
       return null
     }
@@ -461,6 +471,7 @@ export default class QuizAnswerService {
 
     let userIdsInSuitableUQStates = null
 
+    /*
     if (
       typeof peerReviewsGiven === "number" &&
       (peerReviewsGiven > 0 && peerReviewsGiven < 1000) &&
@@ -515,6 +526,7 @@ export default class QuizAnswerService {
           .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
       }
     }
+    
 
     if (userIdsInSuitableUQStates) {
       queryBuilder
@@ -525,6 +537,7 @@ export default class QuizAnswerService {
         )
         .setParameters(userIdsInSuitableUQStates.getParameters())
     }
+    */
 
     if (addSpamFlagNumber) {
       queryBuilder.leftJoinAndMapOne(

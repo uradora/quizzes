@@ -4,6 +4,7 @@ import {
   getQuizAnswers,
 } from "../../services/quizAnswers"
 
+import { IQuizAnswerSearchCriteria } from "../../interfaces"
 import { setQuizzes } from "../quizzes/actions"
 
 export const set = createAction("answers/SET", resolve => {
@@ -16,6 +17,7 @@ export const setAllAnswers = (
   quizId: string,
   wantedPageNumber: number,
   answersPerPage: number,
+  criteria?: IQuizAnswerSearchCriteria,
 ) => {
   return async (dispatch, getState) => {
     try {
@@ -25,6 +27,7 @@ export const setAllAnswers = (
         getState().user,
         (wantedPageNumber - 1) * answersPerPage,
         answersPerPage,
+        criteria,
       )
       await dispatch(set(data))
     } catch (error) {

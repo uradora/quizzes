@@ -15,8 +15,33 @@ import {
   Typography,
 } from "@material-ui/core"
 import React from "react"
+import { connect } from "react-redux"
+import {
+  IQuiz,
+  IQuizAnswerSearchCriteria,
+  QuizAnswerStatus,
+} from "../../interfaces"
+import { setAllAnswers } from "../../store/answers/actions"
 
-const FilterBox = ({ numberOfAnswers }) => {
+interface IFilterBoxProps {
+  numberOfAnswers: number
+  quiz: IQuiz
+  page: number
+  answersPerPage: number
+  loading: boolean
+}
+
+const FilterBox: React.FunctionComponent<IFilterBoxProps> = ({
+  numberOfAnswers,
+  quiz,
+  page,
+  answersPerPage,
+  loading,
+}) => {
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
   return (
     <React.Fragment>
       <Grid
@@ -40,7 +65,11 @@ const FilterBox = ({ numberOfAnswers }) => {
 
         <Grid item={true} xs={12}>
           <Typography variant="subtitle1">Filter options:</Typography>
-          <QuizAnswersFilterSelection />
+          <ConnectedFilter
+            quiz={quiz}
+            page={page}
+            answersPerPage={answersPerPage}
+          />
         </Grid>
 
         <Grid item={true} xs={12}>
@@ -51,17 +80,20 @@ const FilterBox = ({ numberOfAnswers }) => {
   )
 }
 
-type QuizAnswerState =
-  | "submitted"
-  | "confirmed"
-  | "spam"
-  | "rejected"
-  | "deprecated"
+const statuses: QuizAnswerStatus[] = [
+  "draft",
+  "submitted",
+  "enough-received-but-not-given",
+  "spam",
+  "confirmed",
+  "rejected",
+  "deprecated",
+]
 
 interface IQuizAnswersFilterSelectionState {
   minDate: null | string
   maxDate: null | string
-  states: [QuizAnswerState?]
+  statuses: QuizAnswerStatus[]
   minSpamFlags: null | number
   maxSpamFlags: null | number
   minGivenPeerReviews: null | number
@@ -70,10 +102,23 @@ interface IQuizAnswersFilterSelectionState {
   maxReceivedPeerReviews: null | number
   minAverageOfGrades: null | number
   maxAverageOfGrades: null | number
+  submitEnabled: boolean
+}
+
+interface IQuizAnswersFilterSelectionProps {
+  setAllAnswers: (
+    quizId: string,
+    pageNumber: number,
+    answersPerPage: number,
+    query?: IQuizAnswerSearchCriteria,
+  ) => any
+  quiz: IQuiz
+  page: number
+  answersPerPage: number
 }
 
 class QuizAnswersFilterSelection extends React.Component<
-  any,
+  IQuizAnswersFilterSelectionProps,
   IQuizAnswersFilterSelectionState
 > {
   constructor(props) {
@@ -84,7 +129,7 @@ class QuizAnswersFilterSelection extends React.Component<
     this.state = {
       minDate: null,
       maxDate: date.toLocaleDateString(),
-      states: ["submitted"],
+      statuses: ["submitted"],
       minSpamFlags: null,
       maxSpamFlags: null,
       minGivenPeerReviews: null,
@@ -93,6 +138,7 @@ class QuizAnswersFilterSelection extends React.Component<
       maxReceivedPeerReviews: null,
       minAverageOfGrades: null,
       maxAverageOfGrades: null,
+      submitEnabled: false,
     }
   }
 
@@ -104,43 +150,40 @@ class QuizAnswersFilterSelection extends React.Component<
             <Typography>Age</Typography>
 
             <TextField
-              label="min"
-              type="datetime-local"
+              variant="outlined"
+              type="date"
               value={this.state.minDate != null ? this.state.minDate : ""}
               onChange={this.modifyField("minDate")}
             />
             <TextField
-              label="max"
-              type="datetime-local"
+              variant="outlined"
+              type="date"
               value={this.state.maxDate != null ? this.state.maxDate : ""}
-              onChange={this.modifyField("maxValue")}
+              onChange={this.modifyField("maxDate")}
             />
           </ListItem>
 
           <ListItem>
             <FormControl>
-              <FormLabel>Status</FormLabel>
               <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={false}
-                      onChange={testFunction}
-                      value="status1"
+                <FormLabel>Status</FormLabel>
+
+                {statuses.map(status => {
+                  return (
+                    <FormControlLabel
+                      key={status}
+                      control={
+                        <Checkbox
+                          color="primary"
+                          checked={this.state.statuses.includes(status)}
+                          onChange={this.toggleStatus(status)}
+                          value={status}
+                        />
+                      }
+                      label={status}
                     />
-                  }
-                  label="Status no 1"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={true}
-                      onChange={testFunction}
-                      value="status2"
-                    />
-                  }
-                  label="Status no2"
-                />
+                  )
+                })}
               </FormGroup>
             </FormControl>
           </ListItem>
@@ -186,11 +229,24 @@ class QuizAnswersFilterSelection extends React.Component<
           </ListItem>
         </List>
 
-        <Button variant="outlined" color="primary">
+        <Button variant="outlined" color="primary" onClick={this.submitForm}>
           Filter
         </Button>
       </React.Fragment>
     )
+  }
+
+  private submitForm = async () => {
+    const { submitEnabled, ...criteria } = this.state
+    await this.props.setAllAnswers(
+      this.props.quiz.id!,
+      1,
+      this.props.answersPerPage,
+      criteria,
+    )
+    this.setState({
+      submitEnabled: false,
+    })
   }
 
   private modifyField = (fieldName: string) => (e: any) => {
@@ -198,22 +254,17 @@ class QuizAnswersFilterSelection extends React.Component<
     newState[fieldName] = e.target.value
     this.setState(newState)
   }
-}
 
-const testFunction = e => {
-  console.log(
-    "Something happened, here's the event target value: ",
-    e.target.value,
-  )
-}
+  private toggleStatus = (statusName: QuizAnswerStatus) => () => {
+    const wasChecked = this.state.statuses.includes(statusName)
 
-class Selection extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
-  }
+    const newStatuses = wasChecked
+      ? this.state.statuses.filter(name => name !== statusName)
+      : this.state.statuses.concat(statusName)
 
-  public render() {
-    return <div>yeet</div>
+    this.setState({
+      statuses: newStatuses,
+    })
   }
 }
 
@@ -254,5 +305,10 @@ const IntegerSelection: React.FunctionComponent<IntegerSelectionProps> = ({
     </FormGroup>
   )
 }
+
+const ConnectedFilter = connect(
+  null,
+  { setAllAnswers },
+)(QuizAnswersFilterSelection)
 
 export default FilterBox

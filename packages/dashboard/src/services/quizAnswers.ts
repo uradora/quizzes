@@ -1,17 +1,31 @@
 import axios from "axios"
+import { IQuizAnswerSearchCriteria } from "../interfaces"
 
 export const getQuizAnswers = async (
   quizId: string,
   user: any,
   skip: number,
   limit: number,
+  criteria?: IQuizAnswerSearchCriteria,
 ) => {
-  const response = await axios.get(
-    `/api/v1/quizzes/answer/answers?quizId=${quizId}&attention=false&skip=${skip}&limit=${limit}`,
-    {
-      headers: { authorization: `Bearer ${user.accessToken}` },
-    },
-  )
+  let baseString = `/api/v1/quizzes/answer/answers?quizId=${quizId}&attention=false&skip=${skip}&limit=${limit}`
+
+  if (criteria) {
+    Object.keys(criteria).forEach(key => {
+      if (!criteria[key]) {
+        return
+      }
+
+      baseString += `&${key}=${
+        key === "statuses" ? JSON.stringify(criteria[key]) : criteria[key]
+      }`
+    })
+    baseString += "&experimental=true"
+  }
+
+  const response = await axios.get(baseString, {
+    headers: { authorization: `Bearer ${user.accessToken}` },
+  })
 
   return response.data
 }

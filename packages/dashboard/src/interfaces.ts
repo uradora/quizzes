@@ -4,7 +4,7 @@ export type MiscEvent = React.FormEvent<
 
 export type UserCourseRoleType = "administrator" | "assistant" | "teacher"
 
-type QuizAnswerStatus =
+export type QuizAnswerStatus =
   | "draft"
   | "submitted"
   | "enough-received-but-not-given"
@@ -226,4 +226,18 @@ export interface IDashboardFilter {
   course: string
   language: string
   quiz: string
+}
+
+export interface IQuizAnswerSearchCriteria {
+  minDate: null | string
+  maxDate: null | string
+  statuses: QuizAnswerStatus[]
+  minSpamFlags: null | number
+  maxSpamFlags: null | number
+  minGivenPeerReviews: null | number
+  maxGivenPeerReviews: null | number
+  minReceivedPeerReviews: null | number
+  maxReceivedPeerReviews: null | number
+  minAverageOfGrades: null | number
+  maxAverageOfGrades: null | number
 }

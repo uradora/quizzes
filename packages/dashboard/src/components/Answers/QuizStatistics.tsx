@@ -220,7 +220,16 @@ class QuizStatistics extends React.Component<any, any> {
                     spacing={8}
                   >
                     {this.state.showingAll ? (
-                      <FilterOptions numberOfAnswers={totalNumberOfResults} />
+                      <FilterOptions
+                        numberOfAnswers={totalNumberOfResults}
+                        quiz={quiz}
+                        page={this.state.displayingPage}
+                        answersPerPage={this.state.answersPerPage}
+                        loading={
+                          !this.state.initialized ||
+                          this.state.waitingForNewAnswers
+                        }
+                      />
                     ) : (
                       <GeneralQuizStatistics
                         numberOfAnswers={totalNumberOfResults}

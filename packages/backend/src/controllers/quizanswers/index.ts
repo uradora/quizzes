@@ -12,6 +12,7 @@ import {
   Req,
   Res,
   UnauthorizedError,
+  QueryParams,
 } from "routing-controllers"
 import AuthorizationService, {
   Permission,
@@ -232,7 +233,19 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @QueryParam("skip") skip?: number,
     @QueryParam("limit") limit?: number,
-  ): Promise<QuizAnswer[]> {
+    @QueryParam("minDate") minDate?: string,
+    @QueryParam("maxDate") maxDate?: string,
+    @QueryParam("statuses") statuses?: string[],
+    @QueryParam("minSpamFlags") minSpamFlags?: number,
+    @QueryParam("maxSpamFlags") maxSpamFlags?: number,
+    @QueryParam("minGivenPeerReviews") minGivenPeerReviews?: number,
+    @QueryParam("maxGivenPeerReviews") maxGivenPeerReviews?: number,
+    @QueryParam("minReceivedPeerReviews") minReceivedPeerReviews?: number,
+    @QueryParam("maxReceivedPeerReviews") maxReceivedPeerReviews?: number,
+    @QueryParam("minAverageOfGrades") minAverageOfGrades?: number,
+    @QueryParam("maxAverageOfGrades") maxAverageOfGrades?: number,
+    @QueryParam("experimental") experimental?: boolean,
+  ): Promise<QuizAnswer[] | string> {
     const authorized = await this.authorizationService.isPermitted({
       user,
       quizId,
@@ -263,8 +276,23 @@ export class QuizAnswerController {
       attentionCriteriaQuery.lastAllowedTime = limitDate
       attentionCriteriaQuery.statuses = ["spam", "submitted"]
       attentionCriteriaQuery.quizRequiresPeerReviews = true
-    }
+    } else if (experimental) {
+      attentionCriteriaQuery.firstAllowedTime = new Date(minDate)
+      attentionCriteriaQuery.lastAllowedTime = new Date(maxDate)
+      attentionCriteriaQuery.statuses = statuses
+      attentionCriteriaQuery.minPeerReviewsGiven = minGivenPeerReviews
+      attentionCriteriaQuery.maxPeerReviewsGiven = maxGivenPeerReviews
+      attentionCriteriaQuery.minPeerReviewsReceived = minReceivedPeerReviews
+      attentionCriteriaQuery.maxPeerReviewsReceived = maxReceivedPeerReviews
+      attentionCriteriaQuery.minPeerReviewAverage = minAverageOfGrades
+      attentionCriteriaQuery.maxPeerReviewAverage = maxAverageOfGrades
+      attentionCriteriaQuery.minSpamFlags = minSpamFlags
+      attentionCriteriaQuery.maxSpamFlags = maxSpamFlags
 
+      return `Here's what you queried: ${JSON.stringify(
+        attentionCriteriaQuery,
+      )}`
+    }
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
     return result
   }
