@@ -276,9 +276,9 @@ export class QuizAnswerController {
       attentionCriteriaQuery.lastAllowedTime = limitDate
       attentionCriteriaQuery.statuses = ["spam", "submitted"]
       attentionCriteriaQuery.quizRequiresPeerReviews = true
-    } else if (experimental) {
-      attentionCriteriaQuery.firstAllowedTime = new Date(minDate)
-      attentionCriteriaQuery.lastAllowedTime = new Date(maxDate)
+    } else {
+      attentionCriteriaQuery.firstAllowedTime = minDate && new Date(minDate)
+      attentionCriteriaQuery.lastAllowedTime = maxDate && new Date(maxDate)
       attentionCriteriaQuery.statuses = statuses
       attentionCriteriaQuery.minPeerReviewsGiven = minGivenPeerReviews
       attentionCriteriaQuery.maxPeerReviewsGiven = maxGivenPeerReviews
@@ -288,11 +288,8 @@ export class QuizAnswerController {
       attentionCriteriaQuery.maxPeerReviewAverage = maxAverageOfGrades
       attentionCriteriaQuery.minSpamFlags = minSpamFlags
       attentionCriteriaQuery.maxSpamFlags = maxSpamFlags
-
-      return `Here's what you queried: ${JSON.stringify(
-        attentionCriteriaQuery,
-      )}`
     }
+
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
     return result
   }

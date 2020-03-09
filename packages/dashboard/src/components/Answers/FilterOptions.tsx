@@ -128,7 +128,7 @@ class QuizAnswersFilterSelection extends React.Component<
 
     this.state = {
       minDate: null,
-      maxDate: date.toLocaleDateString(),
+      maxDate: formatDateToTextField(new Date()),
       statuses: ["submitted"],
       minSpamFlags: null,
       maxSpamFlags: null,
@@ -218,6 +218,7 @@ class QuizAnswersFilterSelection extends React.Component<
             />
           </ListItem>
 
+          {/*
           <ListItem>
             Average of grades:
             <IntegerSelection
@@ -227,6 +228,7 @@ class QuizAnswersFilterSelection extends React.Component<
               changeMin={this.modifyField("minAverageOfGrades")}
             />
           </ListItem>
+        */}
         </List>
 
         <Button variant="outlined" color="primary" onClick={this.submitForm}>
@@ -304,6 +306,17 @@ const IntegerSelection: React.FunctionComponent<IntegerSelectionProps> = ({
       />
     </FormGroup>
   )
+}
+
+const formatDateToTextField = (date?: Date): string => {
+  if (!date) {
+    return ""
+  }
+  const otherDate = new Date(date)
+  otherDate.setMinutes(otherDate.getMinutes() - otherDate.getTimezoneOffset())
+  let stringDate = otherDate.toISOString()
+  stringDate = stringDate.substring(0, stringDate.length - 8)
+  return stringDate
 }
 
 const ConnectedFilter = connect(
